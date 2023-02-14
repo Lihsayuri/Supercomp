@@ -87,6 +87,7 @@ int exemplo2(){
 #include <cmath>
 #include <iomanip>
 #include <vector>
+#include <bits/stdc++.h>
 using namespace std;
 
 
@@ -128,44 +129,128 @@ int media_variancia(){
 //                                        Matrizes (versão 1)
 // --------------------------------------------------------------------------------------------------------------------
 
-int distancias(){
+int calcula_distancias(){
     int n;
     cin >> n;
-    cout << "Número de linhas: " << n << "\n";
+    vector<double> x,y;
+    // cout << "Número de linhas: " << n << "\n";
     vector<vector<double> > vec;
 
     for (int i = 0; i < n; i++){
-        vector<double> linha;
-        for (int j = 0; j < 2; j++){
-            double num;
-            cin >> num;
-            linha.push_back(num);
+        double xa, ya;
+        cin >> xa >> ya;
+        x.push_back(xa);
+        y.push_back(ya);        
+    }
+
+    vector<vector<double>> resultados;
+
+    for (int i = 0; i < n ; i++){
+        vector <double> linha;
+        for (int j = 0; j < n; j++){
+            linha.push_back(0.0);
         }
-        vec.push_back(linha);
-        // cout << "Linha0: " << linha[0] << "\n";
-        // cout << "Linha1: " << linha[1] << "\n";
-        
+        resultados.push_back(linha);
     }
 
-    vector <double> resultados;
-    for (int i = 1; i < n; i++){
-            int x1 = pow((vec[i][0] - vec[i-1][0]), 2);
-            int y1 = pow((vec[i][1] - vec[i-1][1]), 2);
-            double distancia = sqrt(x1 + y1);
-            resultados.push_back(distancia);
-            cout << "distancia: " << distancia << "\n";        
-            
+
+
+    for (int i = 0; i < n; i++){
+        vector<double> linha;
+        for (int j = 0; j < n; j++){
+            if (i == j){
+                resultados[i][j] = 0.0;  // na diagonal principal tem a cidade com ela mesma, logo o resultado vai ser 0
+                continue;
+            }
+            else if (i < j){   // esse if calcula apenas a parte superior da matriz, pois a parte inferior é simétrica
+                double x1 = pow((x[i] - x[j]), 2);
+                double y1 = pow((y[i] - y[j]), 2);
+                double distancia = sqrt(x1 + y1);
+                resultados[i][j] = distancia;
+            }
+            else {  // caso em que i > j (parte inferior da matriz)
+                resultados[i][j] = resultados[j][i];
+            }
+
+        }
     }
 
+    // for apenas para mostrar a matriz
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
+            cout << resultados[i][j] << " ";
+        }
+        cout << "\n";
+    }
 
     return 0;
+
 }
+
+
+
+int calcula_distancias2(){
+    int n;
+    cin >> n;
+    vector<double> x,y;
+    // cout << "Número de linhas: " << n << "\n";
+    vector<vector<double> > vec;
+
+    for (int i = 0; i < n; i++){
+        double xa, ya;
+        cin >> xa >> ya;
+        x.push_back(xa);
+        y.push_back(ya);        
+    }
+
+    vector<vector<double>> resultados;
+
+    for (int i = 0; i < n; i++){
+        vector<double> linha;
+        for (int j = 0; j < n; j++){
+            double dist;
+            if (i == j){
+                dist = 0.0;  // na diagonal principal tem a cidade com ela mesma, logo o resultado vai ser 0
+            }
+            else if (i < j){   // esse if calcula apenas a parte superior da matriz, pois a parte inferior é simétrica
+                double x1 = pow((x[i] - x[j]), 2);
+                double y1 = pow((y[i] - y[j]), 2);
+                dist = sqrt(x1 + y1);
+            }
+            else {  // caso em que i > j (parte inferior da matriz)
+                dist = resultados[j][i];
+            }
+
+            linha.push_back(dist);
+        }
+
+        resultados.push_back(linha);
+    }
+
+    // for apenas para mostrar a matriz
+    for (int i = 0; i < n; i++){
+        for (int j = 0; j < n; j++){
+            cout << resultados[i][j] << " ";
+        }
+        cout << "\n";
+    }
+
+    return 0;
+
+}
+
+
+
 
 int main(){
     // exemplo1();
     // somatorio(10);
     // exemplo2();
     // media_variancia();
-    distancias();
+  
+    //calcula_distancias(); 
+    calcula_distancias2(); 
+
+
     return 0;
 }
