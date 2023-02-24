@@ -50,7 +50,7 @@ void mais_caro(){
 		return a < b;
 	});
 
-	std::cout << peso_final << " " << valor_final << "\n";
+	std::cout << peso_final << " " << valor_final <<  " " << "0"  << "\n";
 	for (int i = 0; i < j; i++){
 		std::cout << resposta[i] << " ";
 	}
@@ -106,7 +106,7 @@ void mais_leve(){
 		return a < b;
 	});
 
-	std::cout << peso_final << " " << valor_final << "\n";
+	std::cout << peso_final << " " << valor_final << " " << "0"  << "\n";
 
 	for (int i = 0; i < j; i++){
 		std::cout << resposta[i] << " ";
