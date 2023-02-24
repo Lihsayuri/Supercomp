@@ -42,7 +42,7 @@ void calcula_distancias2(matriz &mat, std::vector<double> &x, std::vector<double
 }
 
 
-void calcula_distancias3(matriz &mat, std::vector<double> &x, std::vector<double> y){
+void calcula_distancias3(matriz &mat, std::vector<double> &x, std::vector<double> &y){
     int n = x.size();
     for (int i = 0; i < n ; i++){
         std::vector <double> linha;
@@ -62,6 +62,35 @@ void calcula_distancias3(matriz &mat, std::vector<double> &x, std::vector<double
         }
     }
 }
+
+
+
+void calcula_distancias4(matriz &mat, std::vector<double> &x, std::vector<double> &y){
+    int n = x.size();
+    mat.resize(n*n);
+
+    // definindo o tamanho do vetor contínuo
+    std::vector<int> vec(n*n);
+
+    // percorrendo a matriz e atribuindo os elementos no vetor contínuo
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 2; j++) {
+            int idx = i * 2 + j;
+            vec[idx] = mat[i][j];
+        }
+    }
+
+    for (int i = 0; i < n; i++) {
+        for (int j = i; j < n; j++) {
+            double dx = x[i] - x[j];
+            double dy = y[i] - y[j];
+            double dist = sqrt(dx*dx + dy*dy);
+            vec[i * n + j] = dist;
+            vec[j * n + i] = dist;
+        }
+    }
+}
+
 
 int main() {
     matriz mat;
@@ -86,8 +115,13 @@ int main() {
 
 
     std::cout << "Versão do 3 \n";
-    calcula_distancias3(mat, x, y);
+    //calcula_distancias3(mat, x, y);
+
+    std::cout << "Versão do 4 \n";
+
     
+
+    calcula_distancias4(mat, x, y);
 
     for (auto &linha : mat) {
         for (double el : linha) {
