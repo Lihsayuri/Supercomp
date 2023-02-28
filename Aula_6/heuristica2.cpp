@@ -5,7 +5,9 @@
 #include <random>
 #include <chrono>
 #include <stdlib.h> 
-// using std::vector
+#include <fstream>
+using std::vector;
+using std::cin;
 
 struct item{
 	int id;
@@ -13,26 +15,29 @@ struct item{
 	double valor;
 };
 
-void mais_caro(std::vector<item>&vec, int &n, double &capacidade){
+void mais_caro(vector<item>&vec, int &n, double &capacidade){
 	std::sort(vec.begin(), vec.end(), [] (const item &a, const item &b){
 		return a.valor > b.valor;
 	});
 }
 
 int main(){
-	std::vector<item>vec;
+	std::ofstream arquivo("resposta2.txt", std::ios::app);
+  
+
+	vector<item>vec;
 	int n;
 	double capacidade;
 
-	std::cin >> n;
-	std::cin >> capacidade;
-	std::vector<int>resposta(n, 0.0);
+	cin >> n;
+	cin >> capacidade;
+	vector<int>resposta(n, 0.0);
 
 	for (int i = 0; i < n; i++){
 		item it;
 		it.id = i;
-		std::cin >> it.peso;
-		std::cin >> it.valor;
+		cin >> it.peso;
+		cin >> it.valor;
 		vec.push_back(it);
 	}
 
@@ -54,18 +59,22 @@ int main(){
 	}
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
- 	std::default_random_engine generator(seed); 	// aplique uma binomial com n = n e p = 0.5
+ 	std::default_random_engine generator(seed); 	
 	std::binomial_distribution<int> distribution(1, 0.5);
 
 	for (int i = qtd_heuristica; i < n; i++){
 		int sorteio = distribution(generator); // gera número
 		resposta[vec[i].id] = sorteio*abs(rand()%2);
 	}
-
-
-	for (int i = 0; i < n; i++){
-		std::cout << resposta[i] << " ";
-	}
-
+	
+	if (arquivo.is_open()) {
+		for (int i = 0; i < n; i++){
+			arquivo << resposta[i] << " ";
+		} 
+		arquivo << "\n";
+    	arquivo.close();
+  	} else {
+    	std::cout << "Erro ao abrir arquivo" << std::endl;
+  	}
 
 }

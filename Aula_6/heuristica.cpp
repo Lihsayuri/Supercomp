@@ -5,7 +5,10 @@
 #include <random>
 #include <chrono>
 #include <stdlib.h> 
-// using std::vector
+#include <fstream>
+using std::vector;
+using std::cin;
+using std::cout;
 
 struct item{
 	int id;
@@ -13,33 +16,34 @@ struct item{
 	double valor;
 };
 
-void mais_caro(std::vector<item>&vec, int &n, double &capacidade){
+void mais_caro(vector<item>&vec, int &n, double &capacidade){
 	std::sort(vec.begin(), vec.end(), [] (const item &a, const item &b){
 		return a.valor > b.valor;
 	});
 }
 
 int main(){
-	std::vector<item>vec;
+	std::ofstream arquivo("resposta.txt", std::ios::app);
+	vector<item>vec;
 	int n;
 	double capacidade;
 
-	std::cin >> n;
-	std::cin >> capacidade;
-	std::vector<int>resposta(n, 0.0);
+	cin >> n;
+	cin >> capacidade;
+	vector<int>resposta(n, 0.0);
 
 	for (int i = 0; i < n; i++){
 		item it;
 		it.id = i;
-		std::cin >> it.peso;
-		std::cin >> it.valor;
+		cin >> it.peso;
+		cin >> it.valor;
 		vec.push_back(it);
 	}
 
 
 	//int seed = 10;
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
- 	std::default_random_engine generator(seed); 	// aplique uma binomial com n = n e p = 0.75
+ 	std::default_random_engine generator(seed); 	
 	std::binomial_distribution<int> distribution(1, 0.75);
 
 	for (int i = 0; i < n; i++){
@@ -48,7 +52,7 @@ int main(){
 	}
 
 	unsigned seed2 = std::chrono::system_clock::now().time_since_epoch().count();
- 	std::default_random_engine generator2(seed2); 	// aplique uma binomial com n = n e p = 0.75
+ 	std::default_random_engine generator2(seed2); 	
 	std::binomial_distribution<int> distribution2(1,0.25);
 	
 
@@ -61,7 +65,15 @@ int main(){
 		}
 	}
 
-	for (int i = 0; i < n; i++){
-		std::cout << resposta[i] << " ";
-	}
+
+	if (arquivo.is_open()) {
+		for (int i = 0; i < n; i++){
+			arquivo << resposta[i] << " ";
+		} 
+		arquivo << "\n";
+    	arquivo.close();
+  	} else {
+    	std::cout << "Erro ao abrir arquivo" << std::endl;
+  	}
+
 }
