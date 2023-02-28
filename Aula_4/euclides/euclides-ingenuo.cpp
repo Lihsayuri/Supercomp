@@ -69,24 +69,15 @@ void calcula_distancias4(matriz &mat, std::vector<double> &x, std::vector<double
     int n = x.size();
     mat.resize(n*n);
 
-    // definindo o tamanho do vetor contínuo
-    std::vector<int> vec(n*n);
-
-    // percorrendo a matriz e atribuindo os elementos no vetor contínuo
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
-            int idx = i * 2 + j;
-            vec[idx] = mat[i][j];
-        }
-    }
-
     for (int i = 0; i < n; i++) {
         for (int j = i; j < n; j++) {
             double dx = x[i] - x[j];
             double dy = y[i] - y[j];
             double dist = sqrt(dx*dx + dy*dy);
-            vec[i * n + j] = dist;
-            vec[j * n + i] = dist;
+            std::vector<double> vec_dist; 
+            vec_dist.push_back(dist);
+            mat[i * n + j] = vec_dist;
+            mat[j * n + i] = vec_dist;
         }
     }
 }
@@ -118,8 +109,6 @@ int main() {
     //calcula_distancias3(mat, x, y);
 
     std::cout << "Versão do 4 \n";
-
-    
 
     calcula_distancias4(mat, x, y);
 
