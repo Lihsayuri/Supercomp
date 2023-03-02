@@ -10,6 +10,11 @@ using std::vector;
 using std::cin;
 using std::cout;
 
+// Nesse documento, adoto como heuristica o binomial. 
+// A heuristica binomial é uma heuristica que gera um número aleatório
+// entre 0 e 1. Na primeira vez ele tem 0.75 de chance de gerar 1 e 0.25 de chance de gerar 0.
+// Na segunda vez, ele tem 0.25 de chance de gerar 1 e 0.75 de chance de gerar 0.
+
 struct item{
 	int id;
 	double peso;
@@ -77,3 +82,6 @@ int main(){
   	}
 
 }
+
+
+// Testando com : ./heuristica < in1_a.txt . Vai escrever em resposta.txt. Depois usuar o selecao (lembrar de trocar o resposta no código e de passar o in.txt)

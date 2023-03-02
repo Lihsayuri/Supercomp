@@ -9,6 +9,10 @@
 using std::vector;
 using std::cin;
 
+// Nesse documento, adoto como heuristica o maior valor. Dessa forma, se minha mochila tem n itens, 0.75 (arredondado) dos itens vai seguir 
+// a heuristica de maior valor. Os outros 0.25 (arredondado) vão seguir a aleatoriedade.
+
+
 struct item{
 	int id;
 	double peso;
@@ -78,3 +82,5 @@ int main(){
   	}
 
 }
+
+// Testando com : ./heuristica2 < in1_a.txt . Vai escrever em resposta2.txt. Depois usuar o selecao (lembrar de trocar o resposta no código e de passar o in.txt)
