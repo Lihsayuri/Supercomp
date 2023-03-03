@@ -8,79 +8,50 @@
 #include <fstream>
 using std::vector;
 using std::cin;
+using std::cout;
+using std::endl;
 
-// Nesse documento, adoto como heuristica o maior valor. Dessa forma, se minha mochila tem n itens, 0.75 (arredondado) dos itens vai seguir 
-// a heuristica de maior valor. Os outros 0.25 (arredondado) vão seguir a aleatoriedade.
-
-
-struct item{
-	int id;
-	double peso;
-	double valor;
+struct Filme{
+    int inicio;
+    int fim;
+    int categoria;
 };
 
-void mais_caro(vector<item>&vec, int &n, double &capacidade){
-	std::sort(vec.begin(), vec.end(), [] (const item &a, const item &b){
-		return a.valor > b.valor;
+
+void ordena_final(vector<Filme> &matriz_filmes){
+    std::sort(matriz_filmes.begin(), matriz_filmes.end(), [] (Filme &a, Filme &b){
+		return a.fim < b.fim;
 	});
+
 }
+
 
 int main(){
-	std::ofstream arquivo("resposta2.txt", std::ios::app);
-  
+    int qtd_filmes, qtd_categorias;
+    cin >> qtd_filmes >> qtd_categorias;
 
-	vector<item>vec;
-	int n;
-	double capacidade;
+    vector<int> filmes_por_categoria(qtd_categorias, 0);
+    vector<Filme> matriz_filmes;
 
-	cin >> n;
-	cin >> capacidade;
-	vector<int>resposta(n, 0.0);
+    for (int i = 0; i < qtd_categorias; i++){
+        cin >> filmes_por_categoria[i];
+    }
 
-	for (int i = 0; i < n; i++){
-		item it;
-		it.id = i;
-		cin >> it.peso;
-		cin >> it.valor;
-		vec.push_back(it);
-	}
 
-	mais_caro(vec, n, capacidade);
+    for (int i = 0; i < qtd_filmes; i++){
+        Filme filme;
+        cin >> filme.inicio >> filme.fim >> filme.categoria;
+        matriz_filmes.push_back(filme);
+    }
 
-	// for (int i = 0; i < n; i++){
-	// 	std::cout << vec[i].id << " " << vec[i].peso << " " << vec[i].valor << "\n";
-	// }
+    ordena_final(matriz_filmes);
 
-	int qtd_heuristica = int(n*0.75);
+    // Se o vetor tiver dois horários finais iguais, o que vem primeiro vai ser o vetor com o horśrio inicial menor.
 
-	for (int i = 0; i < n; i++){
-		if (i < qtd_heuristica){
-			resposta[vec[i].id] = 1;
-		} else {
-			break;
-		}
 
-	}
+    for (int i = 0; i < qtd_filmes; i++){
+        cout << matriz_filmes[i].inicio << " " << matriz_filmes[i].fim << " " << matriz_filmes[i].categoria << endl;
+    }
 
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
- 	std::default_random_engine generator(seed); 	
-	std::binomial_distribution<int> distribution(1, 0.5);
-
-	for (int i = qtd_heuristica; i < n; i++){
-		int sorteio = distribution(generator); // gera número
-		resposta[vec[i].id] = sorteio*abs(rand()%2);
-	}
-	
-	if (arquivo.is_open()) {
-		for (int i = 0; i < n; i++){
-			arquivo << resposta[i] << " ";
-		} 
-		arquivo << "\n";
-    	arquivo.close();
-  	} else {
-    	std::cout << "Erro ao abrir arquivo" << std::endl;
-  	}
-
+    return 0;
 }
-
-// Testando com : ./heuristica2 < in1_a.txt . Vai escrever em resposta2.txt. Depois usuar o selecao (lembrar de trocar o resposta no código e de passar o in.txt)
