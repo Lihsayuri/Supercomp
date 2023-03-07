@@ -28,7 +28,7 @@ void mais_caro(vector<item>&vec, int &n, double &capacidade){
 }
 
 int main(){
-	std::ofstream arquivo("resposta.txt", std::ios::app);
+	std::ofstream arquivo("mochila_completa.txt", std::ios::app);
 	vector<item>vec;
 	int n;
 	double capacidade;
@@ -59,6 +59,14 @@ int main(){
 			valor+= vec[i].valor;
 		}
 	}
+
+    for (int i = 0; i < n ; i++){
+        int sorteio = distribution(generator)*abs(rand()%2);
+		if (sorteio == 1 && vec[i].peso <= capacidade && resposta[i] == 0){
+			resposta[i] = sorteio;
+			valor+= vec[i].valor;
+		}
+    }
 
 	if (arquivo.is_open()) {
 		for (int i = 0; i < n; i++){
