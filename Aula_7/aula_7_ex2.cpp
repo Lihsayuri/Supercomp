@@ -8,69 +8,72 @@
 using namespace std;
 
 struct item{
+    int id;
     int peso;
     double valor;
 };
 
-// realiza a comparação entre os pesos dos itens para ordenar
-bool compareweight(item a, item b) {
-  return a.peso < b.peso;
+// bool ord (item i, item j){
+//   return (i.peso<j.peso);
+// }
+
+vector<item> knapsack(vector <item> items, int tries){
+  int n = items.size();
+  vector<item> mochila;
+  vector<item> melhor;
+  mochila.reserve(n);
+  melhor.reserve(n);
+  double max = 0;
+
+  for (int t = 0; t < tries; t++){
+    for (int i = 0; i < n; i++){
+      if ((rand()%2 == 1) && (items[i].peso <= W)){
+        mochila[i] = items[i];
+        W -= items[i].peso;
+      } else {
+        mochila[i].id = -1;
+      }
+    }
+
+    double valor = 0;
+    for (int i = 0; i < n; i++){
+      if (mochila[i].id != -1){
+        valor += mochila[i].valor;
+      }
+    }
+
+    if (valor > max){
+      melhor = mochila;
+      max = valor;
+    }
+  }
+
+  return melhor, max;
+
 }
 
 int main() {
-
-  //faz o sorteio com base na seed aleatoria (nunca tem a mesma data) 
-  unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-  default_random_engine generator(seed);
-
-  int n;
-  cin >> n;
-
-  int PESO_MAX;
-  cin >> PESO_MAX;
-  
-  //cria a distribuição binomial para os pesos e valores 
-  binomial_distribution<int> distribution_75(1, 0.5);
-
-  vector<item> all_items;
-  vector<int> mochila(n, 0);
+  int n, W;
+  cin >> n >> W;
+  vector<item> items;
+  vector<item> melhor;
+  int max = 0;
+  items.reserve(n);
 
   for (int i = 0; i < n; i++){
-    item mystruct;
-    cin >> mystruct.peso;
-    cin >> mystruct.valor;
-
-    all_items.push_back(mystruct);
+    double peso, valor;
+    cin >> peso >> valor;
+    items.push_back({i, peso, valor});
   }
 
-  int peso = 0;
-  double valor = 0;
+  melhor, max = knapsack(items, 100);
+
 
   for (int i = 0; i < n; i++){
-    int prob = distribution_75(generator);
-    if (prob == 1){
-      if (all_items[i].peso + peso <= PESO_MAX){
-        peso += all_items[i].peso;
-        valor += all_items[i].valor;
-        mochila[i] = 1;
-      }
-    }
+    cout << melhor[i].id << " ";
   }
+  cout << endl;
 
-  for (int i = 0; i < n; i++){
-    int prob = distribution_75(generator);
-    if (prob == 1){
-      if ((all_items[i].peso + peso <= PESO_MAX) && (mochila[i] == 0)){
-        peso += all_items[i].peso;
-        valor += all_items[i].valor;
-        mochila[i] = 2;
-      }
-    }
-  }  
-
-    cout << peso << " " << valor << endl;
-    for (int i = 0; i < n; i++){
-      cout << mochila[i] << " ";
-    }
+  return 0;
 
 }
