@@ -20,40 +20,66 @@ struct item{
 };
 
 
-int main(){
-	std::ofstream arquivo("resposta.txt", std::ios::app);
-
-	vector<item>vec;
-	int n;
-	double capacidade;
+vector<item> knapsack(vector<item> vec, int capacidade, int tries){
 	int peso = 0;
-
-	cin >> n;
-	cin >> capacidade;
-	vector<int>resposta(n, 0.0);
+	melhor.reserve(n)
+	mochila.reserve(n);
 
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
  	std::default_random_engine generator(seed); 	
 	std::binomial_distribution<int> distribution(1, 0.5);
 
-	for (int i = 0; i < n; i++){
-		int sorteio = distribution(generator); // gera número
-		if ((peso + vec[i].peso) <= capacidade){
-			resposta[vec[i].id] = sorteio*abs(rand()%2);
-			peso += vec[i].peso;
-		}
-	}
-	
-	if (arquivo.is_open()) {
+	for (int t = 0; t < tries; t++){
 		for (int i = 0; i < n; i++){
-			arquivo << resposta[i] << " ";
-		} 
-		arquivo << "\n";
-    	arquivo.close();
-  	} else {
-    	std::cout << "Erro ao abrir arquivo" << std::endl;
-  	}
+			int sorteio = distribution(generator); // gera número
+			if ((sorteio*abs(rand()%2)) == 1  && (peso + vec[i].peso) <= capacidade){
+				mochila[i] = vec[i];
+				peso += vec[i].peso;
+			} else {
+				mochila[i].id = 0;
+			}
+		}
+
+		double valor = 0.0;
+		for (int i=0; i <n ; i++){
+			if (mochila[i].id == 1){
+				valor += mochila[i].valor;
+			}
+		}
+
+		if (valor > melhor_valor){
+			melhor = mochila;
+			max = valor;
+		}
+
+		return melhor;
+
+
+	}
+}
+
+int main(){
+	int n;
+	double capacidade;
+	cin >> n;
+	cin >> capacidade;
+
+	vector<item>vec;
+	vector<item> melhor;
+	vec.reserve(n);
+
+	for (int i =0; i < n; i++){
+		double peso, valor;
+		cin >> peso;
+		cin >> valor;
+		vec.push_back({i, peso, valor});
+	}
+
+	melhor = knapsack(vec, capacidade, 10);
+
+	return 0;
+
 
 }
 
