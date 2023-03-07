@@ -6,10 +6,14 @@
 #include <chrono>
 #include <stdlib.h> 
 #include <fstream>
+#include <bitset>
 using std::vector;
 using std::cin;
 using std::cout;
 using std::endl;
+using std::bitset;
+
+//// DÚVIDAS: O QUE FAZER QUANDO O FILME COMEÇAR E TERMINAR NA MESMA HORA? E SE TIVER DOIS FILMES QUE COMEÇAM E TERMINAM NA MESMA HORA? 
 
 struct Filme{
     int inicio;
@@ -27,7 +31,6 @@ void ordena_final(vector<Filme> &matriz_filmes){
 
 void ordena_inicio(vector<Filme> &matriz_filmes){
     // Se e somente se o vetor tiver dois horários finais iguais, o que vem primeiro vai ser o vetor com o horśrio inicial menor.
-
     for (int i = 0; i < int(matriz_filmes.size()); i++){
         if (matriz_filmes[i].fim == matriz_filmes[i+1].fim){
             if (matriz_filmes[i].inicio > matriz_filmes[i+1].inicio){
@@ -39,6 +42,20 @@ void ordena_inicio(vector<Filme> &matriz_filmes){
     }
 }
 
+void preenche_bitset(bitset<24> &horarios_disponiveis, int inicio, int fim){
+    for (int i = 0; i < 24; i++){
+        if (i >= inicio && i < fim){
+            horarios_disponiveis.set(i);
+        }
+        else if (inicio > fim && (i >= inicio || i < fim)){// podemos assistir um filme das 23 as 1. Dessa forma, passamos assistindo às 23h e 24h inteiras. Mas não a 1h. 
+            horarios_disponiveis.set(i);
+        }
+        else if(inicio == fim){
+            horarios_disponiveis.set(inicio);
+        }
+    }
+}
+
 
 int main(){
     int qtd_filmes, qtd_categorias;
@@ -46,6 +63,10 @@ int main(){
 
     vector<int> filmes_por_categoria(qtd_categorias, 0);
     vector<Filme> matriz_filmes;
+    bitset<24> horarios_disponiveis;
+    bitset<24> mascara_horarios(0xFFFFFF);
+    vector<Filme> matriz_filmes_vistos;
+    int filmes_vistos = 0;
 
     for (int i = 0; i < qtd_categorias; i++){
         cin >> filmes_por_categoria[i];
@@ -55,55 +76,45 @@ int main(){
     for (int i = 0; i < qtd_filmes; i++){
         Filme filme;
         cin >> filme.inicio >> filme.fim >> filme.categoria;
+        if (filme.inicio == 0){
+            filme.inicio = 24;
+        }
+        if (filme.fim == 0){
+            filme.fim = 24;
+        }
         matriz_filmes.push_back(filme);
     }
 
     ordena_final(matriz_filmes);
-    // Se o vetor tiver dois horários finais iguais, o que vem primeiro vai ser o vetor com o horśrio inicial menor.
     ordena_inicio(matriz_filmes);
-
-    // for (int i = 0; i < qtd_filmes; i++){
-    //     cout << matriz_filmes[i].inicio << " " << matriz_filmes[i].fim << " " << matriz_filmes[i].categoria << endl;
-    // }
-
-    int filmes_vistos = 0;
-    vector<Filme> matriz_filmes_vistos;
 
     for (int i = 0; i < qtd_filmes; i++){
         if (i == 0){
             filmes_vistos++;
             matriz_filmes_vistos.push_back(matriz_filmes[i]);
-            filmes_por_categoria[matriz_filmes[i].categoria]--;
-        } else{
-            int horario_inicial_filme = matriz_filmes[i].inicio;
-            int horario_final_filme = matriz_filmes[i].fim;
-            int horario_final_assistido = matriz_filmes_vistos[filmes_vistos-1].fim;
-            int horario_inicial_assistido = matriz_filmes_vistos[filmes_vistos-1].inicio;
-            if (horario_inicial_filme == 0){
-                horario_inicial_filme = 24;
-            } if (horario_final_filme == 0){
-                horario_final_filme = 24;
-            }
-            if (horario_final_assistido == 0){
-                horario_final_assistido = 24;
-            } if (horario_inicial_assistido == 0){
-                horario_inicial_assistido = 24;
-            }
-             // // confere se o horário de inicio e fim do filme não estão entre o horário de inicio e fim do filme assistido anteriormente.
-            // if ((horario_inicial_filme >= horario_final_assistido) && (horario_final_filme <= horario_final_assistido)){
-            //     continue;
-            // }
-
-            // organiza os filmes assistidos para que não haja conflitos de horários. Por exemplo: não é possível assistir dois filmes ao mesmo tempo. Além disso, há a restrição de quantidade de filmes por categoria.
-            if ((horario_inicial_filme >= horario_final_assistido) && (filmes_por_categoria[matriz_filmes[i].categoria] > 0) && (horario_inicial_filme != horario_inicial_assistido)){   
+            filmes_por_categoria[matriz_filmes[i].categoria-1]--;
+            preenche_bitset(horarios_disponiveis, matriz_filmes[i].inicio-1, matriz_filmes[i].fim-1);
+        } else {
+            bitset<24> horario_analisado;
+            preenche_bitset(horario_analisado, matriz_filmes[i].inicio-1, matriz_filmes[i].fim-1);
+            if ((!(horarios_disponiveis & horario_analisado).any()) && (filmes_por_categoria[matriz_filmes[i].categoria-1] > 0)){   // Retorna true se algum dos bits do bitset for 1
                 filmes_vistos++;
                 matriz_filmes_vistos.push_back(matriz_filmes[i]);
-                filmes_por_categoria[matriz_filmes[i].categoria]--;
+                filmes_por_categoria[matriz_filmes[i].categoria-1]--;
+                preenche_bitset(horarios_disponiveis, matriz_filmes[i].inicio-1, matriz_filmes[i].fim-1);
             }
-            
         }
+
     }
 
+
+
+    // for (int i = 0; i < qtd_filmes; i++){
+    //     cout << matriz_filmes[i].inicio << " " << matriz_filmes[i].fim << " " << matriz_filmes[i].categoria << endl;
+    // }
+
+
+   
     cout << "Foram vistos " << filmes_vistos << " filmes." << endl;
 
     for (int i = 0; i < int(matriz_filmes_vistos.size()); i++){
