@@ -89,6 +89,9 @@ int main(){
     ordena_inicio(matriz_filmes);
 
     for (int i = 0; i < qtd_filmes; i++){
+        if (matriz_filmes[i].inicio == -1 || matriz_filmes[i].fim == -1){
+            continue;
+        }
         if (i == 0){
             filmes_vistos++;
             matriz_filmes_vistos.push_back(matriz_filmes[i]);
