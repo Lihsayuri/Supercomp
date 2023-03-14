@@ -10,6 +10,7 @@
 #include <fstream>
 #include <bitset>
 #include <map>
+#include <ctime>
 using std::vector;
 using std::cin;
 using std::cout;
@@ -96,6 +97,7 @@ void aleatorizacao(vector<Filme> &matriz_filmes, vector<int> &filmes_por_categor
             numero_aleatorio = 0;
         } else{
             int size_myDictItem = int(disponiveis_no_intervalo.size()-1);
+            srand(time(NULL));
             numero_aleatorio = rand() % size_myDictItem+1;
         }
 
