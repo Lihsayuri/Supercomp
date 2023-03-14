@@ -63,21 +63,15 @@ void preenche_bitset(bitset<24> &horarios_disponiveis, int inicio, int fim){
 void heuristica_gulosa(vector<Filme> &matriz_filmes, vector<int> &filmes_por_categoria, bitset<24> &horarios_disponiveis, vector<Filme> &matriz_filmes_vistos, int &filmes_vistos, int qtd_filmes){
 
     for (int i = 0; i <int(matriz_filmes.size()); i++){
-        if (matriz_filmes[i].inicio == -1 || matriz_filmes[i].fim == -1){
-            continue;
+        bitset<24> horario_analisado;
+        preenche_bitset(horario_analisado, matriz_filmes[i].inicio-1, matriz_filmes[i].fim-1);
+        if ((!(horarios_disponiveis & horario_analisado).any()) && (filmes_por_categoria[matriz_filmes[i].categoria-1] > 0)){   // Retorna true se algum dos bits do bitset for 1
+            filmes_vistos++;
+            matriz_filmes_vistos.push_back(matriz_filmes[i]);
+            filmes_por_categoria[matriz_filmes[i].categoria-1]--;
+            preenche_bitset(horarios_disponiveis, matriz_filmes[i].inicio-1, matriz_filmes[i].fim-1);
+            return;
         }
-        else {
-            bitset<24> horario_analisado;
-            preenche_bitset(horario_analisado, matriz_filmes[i].inicio-1, matriz_filmes[i].fim-1);
-            if ((!(horarios_disponiveis & horario_analisado).any()) && (filmes_por_categoria[matriz_filmes[i].categoria-1] > 0)){   // Retorna true se algum dos bits do bitset for 1
-                filmes_vistos++;
-                matriz_filmes_vistos.push_back(matriz_filmes[i]);
-                filmes_por_categoria[matriz_filmes[i].categoria-1]--;
-                preenche_bitset(horarios_disponiveis, matriz_filmes[i].inicio-1, matriz_filmes[i].fim-1);
-                return;
-            }
-        }
-
     }
 }
 
@@ -86,16 +80,11 @@ void aleatorizacao(vector<Filme> &matriz_filmes, vector<int> &filmes_por_categor
     vector<Filme> disponiveis_no_intervalo;
     if (int(matriz_filmes.size()) > 1) {
         for (int i = 1; i < int(matriz_filmes.size()); i++){
-            if (matriz_filmes[i].inicio == -1 || matriz_filmes[i].fim == -1){
-                continue;
-            }
-            else {
-                bitset<24> horario_analisado;
-                preenche_bitset(horario_analisado, matriz_filmes[i].inicio-1, matriz_filmes[i].fim-1);
-                if ((!(horarios_disponiveis & horario_analisado).any()) && (filmes_por_categoria[matriz_filmes[i].categoria-1] > 0)){   // Retorna true se algum dos bits do bitset for 1
-                    disponiveis_no_intervalo.push_back(matriz_filmes[i]);
-                }
-            }
+            bitset<24> horario_analisado;
+            preenche_bitset(horario_analisado, matriz_filmes[i].inicio-1, matriz_filmes[i].fim-1);
+            if ((!(horarios_disponiveis & horario_analisado).any()) && (filmes_por_categoria[matriz_filmes[i].categoria-1] > 0)){   // Retorna true se algum dos bits do bitset for 1
+                disponiveis_no_intervalo.push_back(matriz_filmes[i]);
+            }  
         }
 
         int numero_aleatorio = 0;
@@ -103,7 +92,6 @@ void aleatorizacao(vector<Filme> &matriz_filmes, vector<int> &filmes_por_categor
         if (int(disponiveis_no_intervalo.size()) == 0){
             return;
         }
-
         if (disponiveis_no_intervalo.size() == 1){
             numero_aleatorio = 0;
         } else{
@@ -138,7 +126,6 @@ int main(){
         cin >> filmes_por_categoria[i];
     }
 
-
     for (int i = 0; i < qtd_filmes; i++){
         Filme filme;
         cin >> filme.inicio >> filme.fim >> filme.categoria;
@@ -147,6 +134,12 @@ int main(){
         }
         if (filme.fim == 0){
             filme.fim = 24;
+        }
+        if (filme.inicio == -1){
+            continue;
+        }
+        if (filme.fim == -1){
+            continue;
         }
         matriz_filmes.push_back(filme);
     }
@@ -157,11 +150,7 @@ int main(){
     map<int, vector<Filme>> myDict;
 
     for (int i = 0; i < qtd_filmes; i++){
-        if (matriz_filmes[i].inicio == -1 || matriz_filmes[i].fim == -1){
-            continue;
-        } else {
-            myDict[matriz_filmes[i].fim].push_back(matriz_filmes[i]);
-        }
+        myDict[matriz_filmes[i].fim].push_back(matriz_filmes[i]);
     }
 
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
