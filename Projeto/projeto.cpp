@@ -61,7 +61,7 @@ void preenche_bitset(bitset<24> &horarios_disponiveis, int inicio, int fim){
     }
 }
 
-void heuristica_gulosa(vector<Filme> &vetor_filmes, vector<int> &filmes_por_categoria, bitset<24> &horarios_disponiveis, vector<Filme> &vetor_filmes_vistos, int &filmes_vistos, int qtd_filmes){
+void heuristica_gulosa(vector<Filme> &vetor_filmes, vector<int> &filmes_por_categoria, bitset<24> &horarios_disponiveis, vector<Filme> &vetor_filmes_vistos, int &filmes_vistos){
 
     for (int i = 0; i <int(vetor_filmes.size()); i++){
         bitset<24> horario_analisado;
@@ -166,7 +166,7 @@ int main(){
             break;
         }
         if (sorteio == 1){
-            heuristica_gulosa(myDict[i], filmes_por_categoria, horarios_disponiveis, vetor_filmes_vistos, filmes_vistos, qtd_filmes);
+            heuristica_gulosa(myDict[i], filmes_por_categoria, horarios_disponiveis, vetor_filmes_vistos, filmes_vistos);
         } else
         {   
             aleatorizacao(myDict[i], filmes_por_categoria, horarios_disponiveis, vetor_filmes_vistos, filmes_vistos);
