@@ -23,11 +23,16 @@ struct item{
 };
 
 
+struct Melhor_mochila{
+    vector<item> itens;
+    double peso;
+    double valor;
+};
+
+
 int num_leaf = 0;
 int num_copy = 0;
-vector<item> melhor_mochila;
-int melhor_mochila_valor = 0;
-
+Melhor_mochila melhor_mochila;
 
 int peso_mochila(vector<item> mochila){
     int peso = 0;
@@ -45,79 +50,37 @@ int valor_mochila(vector<item> mochila){
     return valor;
 }
 
-vector<item> knapsack(int i, vector<item> &vec, double &capacidade, vector<item> mochila, int total_disponivel, int valor_atual){
-    if (peso_mochila(mochila) >= capacidade){
-        return mochila;
+void knapsack(int i, vector<item> &vec, double &capacidade, vector<item> mochila, int potencial){
+    if (valor_mochila(mochila) > melhor_mochila.valor && peso_mochila(mochila) <= capacidade){
+        melhor_mochila.itens = mochila;
+        melhor_mochila.valor = valor_mochila(mochila);
+        melhor_mochila.peso = peso_mochila(mochila);
+        num_copy++;
     }
 
-    if (i == 0){
+    if (melhor_mochila.valor >= potencial && i == int(vec.size())-1){  // potencial  contém o atual mais o valor dos itens que ainda não foram considerados
         num_leaf++;
-        if ((vec[i].peso + peso_mochila(mochila)) <= capacidade){
-            mochila.push_back(vec[i]);
-        }
-        return mochila;
+        return;
+    } else if (melhor_mochila.valor >= potencial && i != int(vec.size())-1) {
+        return;
     }
 
-    if (valor_atual < total_disponivel){
-        total_disponivel -= vec[i].valor;
-        vector<item> m1 = knapsack(i-1, vec, capacidade, mochila, total_disponivel, valor_atual);
-        mochila.push_back(vec[i]);
-        valor_atual += vec[i].valor;
-        vector<item> m2 = knapsack(i-1, vec, capacidade, mochila, total_disponivel, valor_atual);
-        
-        if ((peso_mochila(m1) <= capacidade) && (peso_mochila(m2) <= capacidade)){
-            if (valor_mochila(m1) > valor_mochila(m2)){
-                if (valor_mochila(m1) > melhor_mochila_valor){
-                    melhor_mochila = m1;
-                    melhor_mochila_valor = valor_mochila(m1);
-                    num_copy++;
-                }
-                return m1;
-            }
-            else{
-                if (valor_mochila(m2) > melhor_mochila_valor){
-                    melhor_mochila = m2;
-                    melhor_mochila_valor = valor_mochila(m2);
-                    num_copy++;
-                }
-                return m2;
-            }
-        }
-        else if (peso_mochila(m1) <= capacidade){
-            if (valor_mochila(m1) > melhor_mochila_valor){
-                melhor_mochila = m1;
-                melhor_mochila_valor = valor_mochila(m1);
-                num_copy++;
-            }
-            return m1;
-        }
-        else if (peso_mochila(m2) <= capacidade){
-            if (valor_mochila(m2) > melhor_mochila_valor){
-                melhor_mochila = m2;
-                melhor_mochila_valor = valor_mochila(m2);
-                num_copy++;
-            }
-            return m2;
-        }
-        else{
-            return mochila;
-        }
-    } else if(valor_atual == total_disponivel){
-        if (valor_atual > melhor_mochila_valor){
-            melhor_mochila = mochila;
-            melhor_mochila_valor = valor_atual;
-            num_copy++;
-        }
-    }
+    if (peso_mochila(mochila) > capacidade){
+        return;
+    }  
 
-    return mochila;
+    // cout << "CHEGUEI AQUI"  ;
+
+    knapsack(i+1, vec, capacidade, mochila, potencial-vec[i].valor);
+    mochila.push_back(vec[i]);
+    knapsack(i+1, vec, capacidade, mochila, potencial);
+
 }
 
 int main(){
 	vector<item>vec;
 	int n;
 	double capacidade;
-	int valor = 0;
 
 	cin >> n;
 	cin >> capacidade;
@@ -141,15 +104,23 @@ int main(){
     for (int i = 0; i < int(vec.size()); i++){
         total_disponivel += vec[i].valor;
     }
-    mochila = knapsack(n-1, vec, capacidade, mochila, total_disponivel, 0);
+
+
+    melhor_mochila.valor = 0;
+    melhor_mochila.peso = 0;
+    melhor_mochila.itens = mochila;
+
+    cout << "total_disponivel " << total_disponivel << "\n";
+    knapsack(0, vec, capacidade, mochila, total_disponivel);
 
     // imprima os itens da mochila e o valor total
 
-    for (int i = 0; i < int(mochila.size()); i++){
-        cout << mochila[i].id << " ";
-        valor += mochila[i].valor;
+    for (int i = 0; i < int(melhor_mochila.itens.size()); i++){
+        cout << "ITEM: " <<melhor_mochila.itens[i].id << " " << "PESO: " <<melhor_mochila.itens[i].peso << " ";
     }
-    cout << "Valor: " << valor << "\n";
+    cout << "Valor: " << melhor_mochila.valor << "\n";
+
+    cout << "Peso: " << melhor_mochila.peso << "\n";
 
     cout << "num_leaf " << num_leaf << "\n";
     cout << "num_copy " << num_copy << "\n";
