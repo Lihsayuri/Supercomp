@@ -100,7 +100,7 @@ int main(){
     cout << "Custo final: " << custo_final << "\n";
 
     for (int i = 0; i < int(sets_resposta.size()); i++){
-        cout << sets_resposta[i] << " ";
+        cout << sets_resposta[i] + 1 << " ";
     }
 
     cout << "\n";
