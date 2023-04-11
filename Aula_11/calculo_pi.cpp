@@ -6,7 +6,7 @@
 double calcula_pi(int n){
     double soma = 0;
     int multiplicador = -1;
-    #pragma omp parallel
+    #pragma omp parallel for num_threads(4) reduction(+ : soma)
     for (int i = 0; i < n; i++){
         //soma+= pow(-1, i)/(2*i + 1);// para que ficar fazendo pow toda hora se é só fazer - par 1 ou - impar -1
         multiplicador *= -1;
@@ -29,6 +29,9 @@ int main(){
     long int n = 10000000000;
     double pi = calcula_pi(n);
     std::cout << "Pi = " << pi << std::endl;
+
+    int nthreads = omp_get_max_threads(); // vê todas as que tem disponíveis 
+    std::cout << "Número de threads: " <<  nthreads << std::endl;
 
     auto t_end = std::chrono::high_resolution_clock::now();
 
