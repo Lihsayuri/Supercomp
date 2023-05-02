@@ -34,3 +34,5 @@ int main() {
 
   std::cout << "variancia: " << variance << std::endl;
 }
+
+// nvcc -arch=sm_70  aula.cu -o aula_14
