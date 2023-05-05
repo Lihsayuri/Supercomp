@@ -4,13 +4,14 @@
  #include <chrono>
  #include <cstdlib>
  #include <algorithm>
- #include <thrust/host_vector.h>
+ #include <cmath>
+ #include <random>
+ // imports do thrust
+  #include <thrust/host_vector.h>
  #include <thrust/device_vector.h>
  #include <thrust/generate.h>
  #include <thrust/functional.h>
  #include <thrust/copy.h> 
- #include <cmath>
- #include <random>
 
  using namespace std::chrono;
 
@@ -20,20 +21,26 @@
       ms.count() << " milisegundos" << std::endl;
  }
 
+// CRIAR UM FUNCTOR (TIPO UM KERNEL PARA CALCULAR O QUADRADO)
+
 struct square {
+    // não tem parametro interno, então não precisa nem de construtor de copia
     __host__ __device__
-    float operator()(const float &x) const {
+    float operator()(const float &x) const { // não é o x vetor, é a coordenada do vetor, só um ponto
         return x * x;
     }
 };
 
  // IMPLEMENTE O CALCULO DA MAGNITUDE COM THRUST
- float magnitude(thrust::device_vector<float>& x) {
-     thrust::transform(x.begin() , x.end() , x.begin() , square());     
+ float magnitude(thrust::device_vector<float> x) {
+     thrust::transform(x.begin() , x.end() , x.begin() , square());  // se não colocar nada ou só o begin ele sobrescreve o resultado no próprio vetor   
 
      float soma_quadrados = thrust::reduce(x.begin(), x.end());
      float result = std::sqrt(soma_quadrados);
      return result;
+
+     // outra solucao:
+    //  return std::sqrt(thrust::transform_reduce(x.begin(), x.end(), square(), 0.0f, thrust::plus<float>()));
  }
 
  int main(int argc, char** argv) {
