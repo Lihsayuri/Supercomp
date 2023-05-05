@@ -58,3 +58,6 @@ int main(int argc, char* argv[]) {
           << endl;
 
 }
+
+// nvcc -arch=sm_70  aula15.cu -o aula15
+// ./aula15 10 (esse é o tamanho dos vetores) 2 (essa é a constante)
