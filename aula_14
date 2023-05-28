@@ -1,0 +1,73 @@
+#include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
+#include <thrust/generate.h>
+#include <thrust/sort.h>
+#include <thrust/copy.h>
+#include <thrust/random.h>
+#include <vector>
+using namespace std;
+
+int main() {
+  int N = 10;
+  thrust::device_vector<float> x(N);
+  thrust::sequence (x.begin(), x.end());
+
+  //PASSO 1
+  float media = thrust::reduce(x.begin(), x.end()) / x.size();
+
+  //PASSO 2 (x -mu)
+  thrust::device_vector<float> mu(N, media);
+  thrust::transform(x.begin(), x.end(), mu.begin(), x.begin(), thrust::minus<float>());
+
+  // PASSO 3 (x - mu)^2
+  thrust::transform(x.begin(), x.end(), x.begin(), thrust::square<float>());
+
+  // PASSO 4  SUM (x - mu)^2/ N
+  float variance = thrust::reduce(x.begin(), x.end()) / N;
+
+  std::cout << "variancia: " << variance << std::endl;
+}
+
+// nvcc -arch=sm_70  correcao.cu -o correcao
+
+
+-----------------------------------------------------------------------------
+
+#include <thrust/host_vector.h>
+#include <thrust/device_vector.h>
+#include <thrust/generate.h>
+#include <thrust/sort.h>
+#include <thrust/copy.h>
+#include <thrust/random.h>
+#include <vector>
+using namespace std;
+
+int main() {
+  thrust::device_vector<double> d_vec(10);
+  thrust::sequence (d_vec.begin(), d_vec.end(), 0.0f, 1.0f);
+
+  thrust::device_vector<double>::iterator begin = d_vec.begin();
+  thrust::device_vector<double>::iterator end = d_vec.end();
+  int len = end - begin;
+
+
+  double media = thrust::reduce(d_vec.begin(), d_vec.end()) / len;
+
+//   thrust::device_vector<double> media_vector(len, media);
+
+  thrust::constant_iterator<double> media_vector_begin(media);
+  thrust::constant_iterator<double> media_vector_end = media_vector_begin + len;
+
+  thrust::device_vector<double> subtracao_vec(len);
+  thrust::device_vector<double> quadrado_vec(len);
+  thrust::transform (d_vec.begin(), d_vec.end(), media_vector_begin, subtracao_vec.begin(), thrust::minus<double>());
+  thrust::transform (subtracao_vec.begin(), subtracao_vec.end(), subtracao_vec.begin(), quadrado_vec.begin(), thrust::multiplies<double>());
+
+  double soma_quadrados = thrust::reduce(quadrado_vec.begin(), quadrado_vec.end());
+
+  double variance = soma_quadrados / len;
+
+  std::cout << "variancia: " << variance << std::endl;
+}
+
+// nvcc -arch=sm_70  aula.cu -o aula_14
